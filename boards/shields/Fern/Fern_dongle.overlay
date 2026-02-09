@@ -31,7 +31,7 @@
         reg = <0x3c>;
         width = <128>;
         height = <32>;
-        // 중앙 한 줄 현상을 잡기 위해 오프셋과 레이아웃을 조정합니다.
+        // 많은 128x32 패널에서 노이즈를 해결하는 핵심 수치들입니다.
         segment-offset = <0>;
         page-offset = <0>;
         display-offset = <0>;
@@ -39,9 +39,9 @@
         
         segment-remap;   
         com-invdir;      
-        // 아래 설정을 sequential에서 다시 선언하여 높이 매핑을 바로잡습니다.
-        com-sequential;
-        // prechargep 값을 약간 높여 전압을 안정화합니다.
-        prechargep = <0x22>;
+        // com-sequential; <-- 이 줄을 반드시 삭제하거나 주석 처리하세요.
+        // 대신 아래 설정을 추가하여 하드웨어 핀 배치를 강제합니다.
+        #address-cells = <1>;
+        #size-cells = <0>;
     };
 };
