@@ -1,47 +1,5 @@
-#include <dt-bindings/zmk/matrix_transform.h>
-
-/ {
-    chosen {
-        zmk,kscan = &mock_kscan;
-        zmk,matrix-transform = &default_transform;
-        zephyr,display = &oled;
-    };
-
-    default_transform: matrix_transform {
-        compatible = "zmk,matrix-transform";
-        columns = <1>;
-        rows = <1>;
-        map = <0 0>; 
-    };
-
-    mock_kscan: kscan {
-        compatible = "zmk,kscan-mock";
-        columns = <1>;
-        rows = <1>;
-        events = <0>;
-    };
-};
-
-&xiao_i2c {
-    status = "okay";
-    clock-frequency = <I2C_BITRATE_STANDARD>;
-
-    oled: ssd1306@3c {
-        compatible = "solomon,ssd1306fb";
-        reg = <0x3c>;
-        width = <128>;
-        height = <32>;
-        segment-offset = <0>;
-        page-offset = <0>;
-        display-offset = <0>;
-        multiplex-ratio = <31>;
-        
-        // 모든 리맵 설정을 제거하여 기본 주소 지정 방식을 사용합니다.
-        // segment-remap; (제거)
-        // com-invdir; (제거)
-        com-sequential; 
-        
-        // 전압 펌프와 초기화 강도를 높입니다.
-        prechargep = <0x22>;
-    };
-};
+/*
+ * Copyright (c) 2024 The ZMK Contributors
+ *
+ * SPDX-License-Identifier: MIT
+ */
