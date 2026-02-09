@@ -5,7 +5,6 @@
  */
 
 #include <zephyr/kernel.h>
-
 #include <zephyr/logging/log.h>
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
@@ -55,7 +54,8 @@ enum selection_line_state {
     selection_line_state_bt
 } current_selection_line_state;
 
-lv_point_t selection_line_points[] = { {0, 0}, {13, 0} }; // will be replaced with lv_point_precise_t 
+// LVGL 9 대응: lv_point_t를 lv_point_precise_t로 변경
+static lv_point_precise_t selection_line_points[] = { {0, 0}, {13, 0} }; 
 
 struct output_status_state {
     struct zmk_endpoint_instance selected_endpoint;
@@ -81,13 +81,16 @@ static void anim_x_cb(void * var, int32_t v) {
 
 static void anim_size_cb(void * var, int32_t v) {
     selection_line_points[1].x = v;
+    // 포인트 값이 변경되었음을 알리기 위해 리드로우 유도
+    lv_obj_invalidate(var);
 }
 
 static void move_object_x(void *obj, int32_t from, int32_t to) {
     lv_anim_t a;
     lv_anim_init(&a);
     lv_anim_set_var(&a, obj);
-    lv_anim_set_time(&a, 200); // will be replaced with lv_anim_set_duration
+    // LVGL 9 대응: lv_anim_set_time 대신 lv_anim_set_duration 사용 가능 (하위호환 유지 위해 일단 유지하거나 변경)
+    lv_anim_set_duration(&a, 200); 
     lv_anim_set_exec_cb(&a, anim_x_cb);
     lv_anim_set_path_cb(&a, lv_anim_path_overshoot);
     lv_anim_set_values(&a, from, to);
@@ -98,7 +101,7 @@ static void change_size_object(void *obj, int32_t from, int32_t to) {
     lv_anim_t a;
     lv_anim_init(&a);
     lv_anim_set_var(&a, obj);
-    lv_anim_set_time(&a, 200); // will be replaced with lv_anim_set_duration
+    lv_anim_set_duration(&a, 200);
     lv_anim_set_exec_cb(&a, anim_size_cb);
     lv_anim_set_path_cb(&a, lv_anim_path_ease_in_out);
     lv_anim_set_values(&a, from, to);
