@@ -1,0 +1,12 @@
+file_format: "1"
+id: fern
+name: Fern
+type: shield
+url: https://github.com/OLIVIOU1224/Fern-split/
+requires: 
+  - xiao_ble
+features:
+  - keys
+siblings:
+  - Fern_left
+  - Fern_right

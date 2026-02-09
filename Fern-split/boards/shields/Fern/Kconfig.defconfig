@@ -1,0 +1,19 @@
+# Copyright (c) 2024 The ZMK Contributors
+# SPDX-License-Identifier: MIT
+
+if SHIELD_FERN_LEFT
+
+config ZMK_KEYBOARD_NAME
+    default "Fern"
+    
+config ZMK_SPLIT_BLE_ROLE_CENTRAL
+	default y
+
+endif
+
+if SHIELD_FERN_LEFT || SHIELD_FERN_RIGHT
+
+config ZMK_SPLIT
+    default y
+
+endif

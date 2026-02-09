@@ -1,0 +1,4 @@
+name: zmk-keyboard-Fern
+build:
+  settings:
+     board_root: .
