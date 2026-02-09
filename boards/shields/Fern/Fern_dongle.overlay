@@ -31,15 +31,17 @@
         reg = <0x3c>;
         width = <128>;
         height = <32>;
+        // 중앙 한 줄 현상을 잡기 위해 오프셋과 레이아웃을 조정합니다.
         segment-offset = <0>;
         page-offset = <0>;
         display-offset = <0>;
         multiplex-ratio = <31>;
-        // 설정을 가장 단순하게 바꿉니다.
-        segment-remap;
-        com-invdir;
-        // 128x32에서 이 설정이 노이즈의 원인이 되기도 합니다.
-        // com-sequential; (일단 제거해서 자동 설정 유도)
+        
+        segment-remap;   
+        com-invdir;      
+        // 아래 설정을 sequential에서 다시 선언하여 높이 매핑을 바로잡습니다.
+        com-sequential;
+        // prechargep 값을 약간 높여 전압을 안정화합니다.
         prechargep = <0x22>;
     };
 };
