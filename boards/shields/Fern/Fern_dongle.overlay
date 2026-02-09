@@ -24,6 +24,7 @@
 
 &xiao_i2c {
     status = "okay";
+    clock-frequency = <I2C_BITRATE_STANDARD>; // 속도를 낮춰 안정성 확보
 
     oled: ssd1306@3c {
         compatible = "solomon,ssd1306fb";
@@ -34,11 +35,9 @@
         page-offset = <0>;
         display-offset = <0>;
         multiplex-ratio = <31>;
-        // 128x32 OLED에서 노이즈를 잡는 핵심 설정
-        segment-remap;
-        com-invdir;
+        segment-remap;   // 0번 열을 127로 매핑
+        com-invdir;      // COM 출력 방향 반전
         com-sequential;
-        // 전압 펌프 설정 (노이즈 방지의 핵심)
-        prechargep = <0x22>;
+        prechargep = <0x22>; // 충전 펌프 안정화
     };
 };
