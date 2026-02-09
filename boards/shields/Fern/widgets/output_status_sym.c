@@ -25,7 +25,7 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_SYM_1 uin
 
 const lv_img_dsc_t sym_1 = {
   .header.cf = LV_COLOR_FORMAT_I1,
-  .header.always_zero = 0,
+  //.header.always_zero = 0,
   .header.reserved = 0,
   .header.w = 5,
   .header.h = 6,
@@ -46,7 +46,7 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_SYM_2 uin
 
 const lv_img_dsc_t sym_2 = {
   .header.cf = LV_COLOR_FORMAT_I1,
-  .header.always_zero = 0,
+  //.header.always_zero = 0,
   .header.reserved = 0,
   .header.w = 5,
   .header.h = 6,
@@ -67,7 +67,7 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_SYM_3 uin
 
 const lv_img_dsc_t sym_3 = {
   .header.cf = LV_COLOR_FORMAT_I1,
-  .header.always_zero = 0,
+  //.header.always_zero = 0,
   .header.reserved = 0,
   .header.w = 5,
   .header.h = 6,
