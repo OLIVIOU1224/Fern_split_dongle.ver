@@ -24,4 +24,3 @@ config ZMK_BLE
     default y
 
 endif
-
