@@ -33,9 +33,11 @@
         page-offset = <0>;
         display-offset = <0>;
         multiplex-ratio = <31>;
-        segment-remap;
+        // 아래 설정들이 화면 노이즈를 잡는 핵심입니다
+        segment-remap;   
         com-invdir;
         com-sequential;
+        // 충전 펌프 및 전압 설정 (노이즈 방지)
         prechargep = <0x22>;
     };
 };
