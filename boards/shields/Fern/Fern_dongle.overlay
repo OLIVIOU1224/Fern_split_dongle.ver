@@ -34,9 +34,11 @@
         page-offset = <0>;
         display-offset = <0>;
         multiplex-ratio = <31>;
-        segment-remap;
-        com-invdir;
-        com-sequential;
+        // 노이즈 해결을 위한 설정 조정
         prechargep = <0x22>;
+        // 아래 두 항목이 노이즈에 영향을 줄 수 있으니 일단 기본값으로 테스트합니다
+        // segment-remap; (제거)
+        // com-invdir; (제거)
+        com-sequential;
     };
 };
