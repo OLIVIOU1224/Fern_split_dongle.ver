@@ -55,7 +55,7 @@ enum selection_line_state {
 } current_selection_line_state;
 
 // LVGL 9 대응: lv_point_t를 lv_point_precise_t로 변경
-static lv_point_precise_t selection_line_points[] = { {0, 0}, {13, 0} }; 
+static lv_point_precise_t selection_line_points[] = { {0, 0}, {13, 0} };
 
 struct output_status_state {
     struct zmk_endpoint_instance selected_endpoint;
