@@ -25,18 +25,19 @@
 
 &i2c0 {
     status = "okay";
-    // XIAO BLE의 I2C 핀 번호 (SDA: D4, SCL: D5)
-    // 보드마다 핀 번호가 다를 수 있으나 xiao_ble 기본값은 보통 설정되어 있습니다.
+    pinctrl-0 = <&i2c0_default>;
+    pinctrl-1 = <&i2c0_sleep>;
+    pinctrl-names = "default", "sleep";
 
     oled: ssd1306@3c {
         compatible = "solomon,ssd1306fb";
         reg = <0x3c>;   // OLED의 I2C 주소 (보통 0x3c)
         width = <128>;  // 본인 디스플레이 해상도에 맞게 수정 (128)
-        height = <64>;  // 본인 디스플레이 해상도에 맞게 수정 (32 또는 64)
+        height = <32>;  // 본인 디스플레이 해상도에 맞게 수정 (32 또는 64)
         segment-offset = <0>;
         page-offset = <0>;
         display-offset = <0>;
-        multiplex-ratio = <63>; // height가 64면 63, 32면 31
+        multiplex-ratio = <31>; // height가 64면 63, 32면 31
         segment-remap;
         com-invdir;
         com-sequential;
