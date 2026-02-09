@@ -6,14 +6,22 @@ if SHIELD_FERN_LEFT
 config ZMK_KEYBOARD_NAME
     default "Fern"
     
-config ZMK_SPLIT_BLE_ROLE_CENTRAL
-	default y
+config ZMK_SPLIT_ROLE_CENTRAL
+    default y
+
+config ZMK_USB
+    default y
 
 endif
 
-if SHIELD_FERN_LEFT || SHIELD_FERN_RIGHT
+
+if SHIELD_FERN_LEFT || SHIELD_FERN_RIGHT || SHIELD_FERN_DONGLE
 
 config ZMK_SPLIT
     default y
 
+config ZMK_BLE
+    default y
+
 endif
+
