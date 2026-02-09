@@ -7,4 +7,3 @@ include:
     shield: Fern_dongle
   - board: xiao_ble
     shield: settings_reset
-
