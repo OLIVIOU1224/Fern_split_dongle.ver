@@ -12,6 +12,7 @@ manifest:
     - name: zmk-display-widgets
       remote: caksoylar
       revision: main
+      # 아래 줄을 추가하여 경로 명시 (충돌 방지)
+      path: zmk-display-widgets 
   self:
     path: config
-
