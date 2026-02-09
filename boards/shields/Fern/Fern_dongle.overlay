@@ -16,3 +16,25 @@
         prechargep = <0x22>;
     };
 };
+
+/ {
+    chosen {
+        zmk,kscan = &mock_kscan;
+        zmk,matrix-transform = &default_transform;
+        zephyr,display = &oled;
+    };
+
+    default_transform: matrix_transform {
+        compatible = "zmk,matrix-transform";
+        columns = <1>;
+        rows = <1>;
+        map = <RC(0,0)>;
+    };
+
+    mock_kscan: kscan {
+        compatible = "zmk,kscan-mock";
+        columns = <0>;
+        rows = <0>;
+        events = <0>;
+    };
+};
