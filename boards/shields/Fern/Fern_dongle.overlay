@@ -27,18 +27,18 @@
 
     oled: ssd1306@3c {
         compatible = "solomon,ssd1306fb";
-        reg = <0x3d>;
+        reg = <0x3c>;
         width = <128>;
         height = <32>;
         segment-offset = <0>;
         page-offset = <0>;
         display-offset = <0>;
         multiplex-ratio = <31>;
-        // 노이즈 해결을 위한 설정 조정
-        prechargep = <0x22>;
-        // 아래 두 항목이 노이즈에 영향을 줄 수 있으니 일단 기본값으로 테스트합니다
-        // segment-remap; (제거)
-        // com-invdir; (제거)
+        // 128x32 OLED에서 노이즈를 잡는 핵심 설정
+        segment-remap;
+        com-invdir;
         com-sequential;
+        // 전압 펌프 설정 (노이즈 방지의 핵심)
+        prechargep = <0x22>;
     };
 };
