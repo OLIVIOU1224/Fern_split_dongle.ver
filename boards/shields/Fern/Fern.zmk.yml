@@ -5,6 +5,7 @@ type: shield
 url: https://github.com/OLIVIOU1224/Fern-split/
 requires: 
   - xiao_ble
+  - i2c_oled
 features:
   - keys
 siblings:
