@@ -24,24 +24,21 @@
 
 &xiao_i2c {
     status = "okay";
-    clock-frequency = <I2C_BITRATE_STANDARD>;
 
     oled: ssd1306@3c {
         compatible = "solomon,ssd1306fb";
         reg = <0x3c>;
         width = <128>;
         height = <32>;
-        // 많은 128x32 패널에서 노이즈를 해결하는 핵심 수치들입니다.
         segment-offset = <0>;
         page-offset = <0>;
         display-offset = <0>;
         multiplex-ratio = <31>;
-        
-        segment-remap;   
-        com-invdir;      
-        // com-sequential; <-- 이 줄을 반드시 삭제하거나 주석 처리하세요.
-        // 대신 아래 설정을 추가하여 하드웨어 핀 배치를 강제합니다.
-        #address-cells = <1>;
-        #size-cells = <0>;
+        // 필수 설정들
+        segment-remap;
+        com-invdir;
+        prechargep = <0x22>; // 빌드 에러 해결을 위한 필수값
+        // 128x32 패널은 보통 sequential이 아니어야 글자가 안 깨집니다.
+        // 만약 이번에도 노이즈면 다음엔 이 줄을 추가해볼겁니다.
     };
 };
