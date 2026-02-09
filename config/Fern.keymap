@@ -5,6 +5,7 @@
  */
 
 #include <behaviors.dtsi>
+#include <dt-bindings/zmk/bt.h>
 #include <dt-bindings/zmk/keys.h>
 
 #define BASE 0
@@ -37,10 +38,10 @@
 
         layer_2 {
             bindings = <
-&kp LS(Q)  &kp LS(W)  &kp LS(E)  &kp LS(R)  &kp LS(T)  &trans  &trans  &trans  &trans  &kp BACKSPACE
-&trans     &trans     &trans     &trans     &trans     &trans  &trans  &trans  &trans  &trans
-&trans     &trans     &trans     &trans     &trans     &trans  &trans  &trans  &trans  &trans
-                                 &trans     &trans     &trans  &trans
+&kp LS(Q)  &kp LS(W)  &kp LS(E)  &kp LS(R)  &kp LS(T)  &bt BT_CLR  &trans  &trans  &trans  &kp BACKSPACE
+&trans     &trans     &trans     &trans     &trans     &trans      &trans  &trans  &trans  &trans
+&trans     &trans     &trans     &trans     &trans     &trans      &trans  &trans  &trans  &trans
+                                 &trans     &trans     &trans      &trans
             >;
         };
     };
