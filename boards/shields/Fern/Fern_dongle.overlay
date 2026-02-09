@@ -9,8 +9,7 @@
         compatible = "zmk,matrix-transform";
         columns = <1>;
         rows = <1>;
-        // RC(0,0) 대신 숫자로 직접 좌표를 써줍니다.
-        map = <0 0>; 
+        map = <0 0>;
     };
 
     mock_kscan: kscan {
@@ -21,8 +20,9 @@
     };
 };
 
-&xiao_i2c {
+&i2c0 {
     status = "okay";
+    clock-frequency = <I2C_BITRATE_STANDARD>; // 100kHz로 안정적 시작
 
     oled: ssd1306@3c {
         compatible = "solomon,ssd1306fb";
@@ -33,11 +33,9 @@
         page-offset = <0>;
         display-offset = <0>;
         multiplex-ratio = <31>;
-        // 아래 설정들이 화면 노이즈를 잡는 핵심입니다
-        segment-remap;   
+        segment-remap;
         com-invdir;
         com-sequential;
-        // 충전 펌프 및 전압 설정 (노이즈 방지)
         prechargep = <0x22>;
     };
 };
