@@ -24,6 +24,8 @@
 
 &xiao_i2c {
     status = "okay";
+    // I2C 속도를 표준(100kHz)으로 고정하여 데이터 뭉침 현상을 방지합니다.
+    clock-frequency = <I2C_BITRATE_STANDARD>;
 
     oled: ssd1306@3c {
         compatible = "solomon,ssd1306fb";
@@ -34,11 +36,11 @@
         page-offset = <0>;
         display-offset = <0>;
         multiplex-ratio = <31>;
-        // 필수 설정들
+        
         segment-remap;
         com-invdir;
-        prechargep = <0x22>; // 빌드 에러 해결을 위한 필수값
-        // 128x32 패널은 보통 sequential이 아니어야 글자가 안 깨집니다.
-        // 만약 이번에도 노이즈면 다음엔 이 줄을 추가해볼겁니다.
+        // 세로 한 줄 현상을 해결하기 위해 핀 배치 방식을 강제합니다.
+        com-sequential; 
+        prechargep = <0x22>;
     };
 };
