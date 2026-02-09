@@ -4,6 +4,7 @@ include:
   - board: xiao_ble
     shield: Fern_right
   - board: xiao_ble
-    shield: Fern_dongle
+    shield: DONGLE_DISPLAY_091_OLED
   - board: xiao_ble
     shield: settings_reset
+
