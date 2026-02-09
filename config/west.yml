@@ -7,9 +7,5 @@ manifest:
       remote: zmkfirmware
       revision: main
       import: app/west.yml
-    # remote를 거치지 않고 url을 직접 입력합니다.
-    - name: zmk-display-widgets
-      url: https://github.com/caksoylar/zmk-display-widgets
-      revision: main
   self:
     path: config
