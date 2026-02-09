@@ -24,7 +24,6 @@
 
 &xiao_i2c {
     status = "okay";
-    // I2C 속도를 표준(100kHz)으로 고정하여 데이터 뭉침 현상을 방지합니다.
     clock-frequency = <I2C_BITRATE_STANDARD>;
 
     oled: ssd1306@3c {
@@ -37,10 +36,12 @@
         display-offset = <0>;
         multiplex-ratio = <31>;
         
-        segment-remap;
-        com-invdir;
-        // 세로 한 줄 현상을 해결하기 위해 핀 배치 방식을 강제합니다.
+        // 모든 리맵 설정을 제거하여 기본 주소 지정 방식을 사용합니다.
+        // segment-remap; (제거)
+        // com-invdir; (제거)
         com-sequential; 
+        
+        // 전압 펌프와 초기화 강도를 높입니다.
         prechargep = <0x22>;
     };
 };
