@@ -37,7 +37,3 @@
         inversion-on;
         prechargep = <0x22>;
     };
-};
-&oled {
-    rotation = <90>; // 또는 270
-};
