@@ -79,10 +79,10 @@
         base_layer {
             label = "BA";
             bindings = <
-&Q_Q   &W_W   &E_E   &R_R   &T_T       &kp Y      &kp U          &kp I      &O_O        &P_P
-&kp A  &kp S  &kp D  &kp F  &kp G      &kp H      &kp J          &kp K      &kp L       &kp SEMI
-&kp Z  &kp X  &kp C  &kp V  &kp B      &kp N      &kp M          &kp COMMA  &kp PERIOD  &kp SLASH
-                     &mo 1  &kp ENTER  &kp SPACE  &kp BACKSPACE
+&Q_Q   &W_W   &E_E   &R_R   &T_T           &kp Y      &kp U         &kp I      &O_O        &P_P
+&kp A  &kp S  &kp D  &kp F  &kp G          &kp H      &kp J         &kp K      &kp L       &kp SEMI
+&kp Z  &kp X  &kp C  &kp V  &kp B          &kp N      &kp M         &kp COMMA  &kp PERIOD  &kp SLASH
+                     &mo 1  &kp BACKSPACE  &kp SPACE  &kp KP_ENTER
             >;
         };
 
@@ -99,10 +99,10 @@
         layer_2 {
             label = "BT";
             bindings = <
-&kp LS(Q)  &kp LS(W)  &kp LS(E)  &kp LS(R)  &kp LS(T)  &bt BT_CLR  &trans  &trans  &trans  &kp BACKSPACE
-&trans     &trans     &trans     &trans     &trans     &trans      &trans  &trans  &trans  &trans
-&trans     &trans     &trans     &trans     &trans     &trans      &trans  &trans  &trans  &trans
-                                 &trans     &trans     &trans      &trans
+&kp F1   &kp F2   &kp F3  &kp F4  &kp F5   &bt BT_CLR  &trans  &trans  &trans  &kp BACKSPACE
+&kp F6   &kp F7   &kp F8  &kp F9  &kp F10  &trans      &trans  &trans  &trans  &trans
+&kp F11  &kp F12  &trans  &trans  &trans   &trans      &trans  &trans  &trans  &trans
+                          &trans  &trans   &trans      &trans
             >;
         };
     };
