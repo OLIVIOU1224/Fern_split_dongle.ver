@@ -48,9 +48,6 @@ lv_obj_t *zmk_display_status_screen() {
 
     zmk_widget_dongle_battery_status_init(&dongle_battery_status_widget, screen);
     lv_obj_align(zmk_widget_dongle_battery_status_obj(&dongle_battery_status_widget), LV_ALIGN_BOTTOM_RIGHT, 0, 0);
-
-    zmk_split_peripheral_battery_level(0)
-    zmk_split_peripheral_battery_level(1)
     
     return screen;
 }
