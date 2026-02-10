@@ -9,7 +9,7 @@ if(CONFIG_ZMK_DISPLAY AND CONFIG_ZMK_DISPLAY_STATUS_SCREEN_CUSTOM AND ((NOT CONF
     # 실제 폴더에 존재하는 파일만 등록
     zephyr_library_sources(widgets/output_status.c)
     zephyr_library_sources(widgets/output_status_sym.c)
-
+    target_sources(app PRIVATE zmk_ui.c)
     if (CONFIG_ZMK_BATTERY)
         zephyr_library_sources(widgets/battery_status.c)
     endif()
