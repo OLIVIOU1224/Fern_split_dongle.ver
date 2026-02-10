@@ -10,7 +10,7 @@
 
 #define BA 0
 #define NA 1
-#define BT 1
+#define BT 2
 
 / {
     keymap {
@@ -47,4 +47,5 @@
         };
     };
 };
+
 
