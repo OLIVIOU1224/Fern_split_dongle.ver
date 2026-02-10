@@ -15,3 +15,4 @@ if(CONFIG_ZMK_DISPLAY AND CONFIG_ZMK_DISPLAY_STATUS_SCREEN_CUSTOM AND ((NOT CONF
     endif()
 endif()
 target_sources(app PRIVATE zmk_ui.c)
+target_include_directories(app PRIVATE ${ZEPHYR_BASE}/lib/gui/lvgl)
