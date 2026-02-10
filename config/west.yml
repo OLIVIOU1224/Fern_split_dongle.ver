@@ -3,7 +3,7 @@ manifest:
     - name: zmkfirmware
       url-base: https://github.com/zmkfirmware
     - name: caksoylar
-      url: https://github.com/caksoylar
+      url-base: https://github.com/caksoylar
   projects:
     - name: zmk
       remote: zmkfirmware
@@ -14,4 +14,5 @@ manifest:
       revision: main
   self:
     path: config
+
 
