@@ -21,6 +21,7 @@
 
 &xiao_i2c {
     status = "okay";
+    clock-frequency = <100000>; // 안정적인 100kHz
 
     oled: ssd1306@3c {
         compatible = "solomon,ssd1306fb";
@@ -30,11 +31,16 @@
         segment-offset = <0>;
         page-offset = <0>;
         display-offset = <0>;
-        multiplex-ratio = <31>;  /* 32개 라인 사용 */
-        segment-remap;
-        com-invdir;
-        /* com-sequential; 이 줄이 있다면 반드시 삭제하세요 */
-        /* inversion-on;  이 줄도 일단 삭제하여 검은 배경으로 테스트하세요 */
+        multiplex-ratio = <31>;  // (32라인 - 1)
+        
+        segment-remap;    // 픽셀 방향 반전
+        com-invdir;       // 스캔 방향 반전
+        
+        /* 0.91인치는 픽셀 배치가 교차(Alternative) 방식이어야 합니다. */
+        /* 아래 줄이 없어야 드라이버가 기본값인 'Alternative'를 선택합니다. */
+        /* 만약 아래 줄이 있다면 반드시 삭제하거나 주석 처리하세요. */
+        // com-sequential; 
+
         prechargep = <0x22>;
     };
 };
