@@ -22,7 +22,6 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 static sys_slist_t widgets = SYS_SLIST_STATIC_INIT(&widgets);
 
-// 이미지 선언
 LV_IMG_DECLARE(sym_usb);
 LV_IMG_DECLARE(sym_bt);
 LV_IMG_DECLARE(sym_ok);
@@ -61,11 +60,11 @@ static struct output_status_state get_state(const zmk_event_t *_eh) {
 }
 
 static void set_status_symbol(lv_obj_t *widget, struct output_status_state state) {
-    if (widget == NULL) return;
+    if (widget == NULL) { return; }
 
     lv_obj_t *usb = lv_obj_get_child(widget, 0);
     lv_obj_t *usb_hid_status = lv_obj_get_child(widget, 1);
     lv_obj_t *bt = lv_obj_get_child(widget, 2);
     lv_obj_t *bt_number = lv_obj_get_child(widget, 3);
     lv_obj_t *bt_status = lv_obj_get_child(widget, 4);
-    lv_obj_t *selection_line = lv_obj_get_child(widget, 5
+    lv
