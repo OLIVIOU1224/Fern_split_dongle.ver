@@ -32,7 +32,7 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 /* LVGL 9 정렬을 위해 가로 폭을 8의 배수로 설정 */
 #define CANVAS_WIDTH 8
 #define CANVAS_HEIGHT 8
-#define BUFFER_SIZE 8 // (8*8)/8 = 8 bytes
+#define BUFFER_SIZE 16
 
 static sys_slist_t widgets = SYS_SLIST_STATIC_INIT(&widgets);
 
