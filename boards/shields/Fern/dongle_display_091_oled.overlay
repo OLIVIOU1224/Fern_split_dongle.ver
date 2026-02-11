@@ -21,7 +21,8 @@
 
 &xiao_i2c {
     status = "okay";
-    clock-frequency = <100000>; // 안정적인 100kHz
+    clock-frequency = <100000>; 
+    /* XIAO BLE의 표준 I2C 핀 확인 (D4=SDA, D5=SCL) */
 
     oled: ssd1306@3c {
         compatible = "solomon,ssd1306fb";
@@ -31,8 +32,11 @@
         segment-offset = <0>;
         page-offset = <0>;
         display-offset = <0>;
-        multiplex-ratio = <31>;  // (32라인 - 1)
-
+        multiplex-ratio = <31>;
+        segment-remap;
+        com-invdir;
         prechargep = <0x22>;
+        /* 아래 설정을 추가하여 초기화 지연 시간을 벌어줍니다 */
+        ready-time-ms = <100>;
     };
 };
