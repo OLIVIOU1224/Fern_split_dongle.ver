@@ -32,10 +32,6 @@
         page-offset = <0>;
         display-offset = <0>;
         multiplex-ratio = <31>;  // (32라인 - 1)
-        /* 0.91인치는 픽셀 배치가 교차(Alternative) 방식이어야 합니다. */
-        /* 아래 줄이 없어야 드라이버가 기본값인 'Alternative'를 선택합니다. */
-        /* 만약 아래 줄이 있다면 반드시 삭제하거나 주석 처리하세요. */
-        // com-sequential; 
 
         prechargep = <0x22>;
     };
