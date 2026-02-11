@@ -32,7 +32,7 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 /* ### 수정: LVGL 9에서는 I1(1비트) 포맷 사용 시 가로 폭을 8의 배수로 정렬하는 것이 안전합니다. ### */
 /* (5px 폭이지만 안전하게 8px 분량의 공간 할당) */
-#define BUFFER_SIZE (8 * 8 / 8) 
+#define BUFFER_SIZE 16
 
 static sys_slist_t widgets = SYS_SLIST_STATIC_INIT(&widgets);
 
@@ -93,96 +93,72 @@ static void draw_battery(lv_obj_t *canvas, uint8_t level, bool usb_present) {
     lv_canvas_finish_layer(canvas, &layer);
 }
 
-static void set_battery_symbol(lv_obj_t *widget, struct battery_state state) {
-    if (state.source >= ZMK_SPLIT_BLE_PERIPHERAL_COUNT + SOURCE_OFFSET) {
-        return;
-    }
-    LOG_DBG("source: %d, level: %d, usb: %d", state.source, state.level, state.usb_present);
-    lv_obj_t *symbol = battery_objects[state.source].symbol;
-    lv_obj_t *label = battery_objects[state.source].label;
+static void draw_battery(lv_obj_t *canvas, uint8_t level, bool usb_present) {
+    if (canvas == NULL) return;
 
-    draw_battery(symbol, state.level, state.usb_present);
-    lv_label_set_text_fmt(label, "%4u%% ", state.level);
+    /* 캔버스 전체를 검은색으로 밀어서 잔상/노이즈 제거 */
+    lv_canvas_fill_bg(canvas, lv_color_black(), LV_OPA_COVER);
     
-    if (state.level > 0 || state.usb_present) {
-        lv_obj_clear_flag(symbol, LV_OBJ_FLAG_HIDDEN);
-        lv_obj_move_foreground(symbol);
-        lv_obj_clear_flag(label, LV_OBJ_FLAG_HIDDEN);
-        lv_obj_move_foreground(label);
-    } else {
-        lv_obj_add_flag(symbol, LV_OBJ_FLAG_HIDDEN);
-        lv_obj_add_flag(label, LV_OBJ_FLAG_HIDDEN);
+    lv_layer_t layer;
+    lv_canvas_init_layer(canvas, &layer);
+
+    lv_draw_rect_dsc_t rect_fill_dsc;
+    lv_draw_rect_dsc_init(&rect_fill_dsc);
+    rect_fill_dsc.bg_color = lv_color_white();
+
+    if (usb_present) {
+        rect_fill_dsc.bg_opa = LV_OPA_TRANSP;
+        rect_fill_dsc.border_color = lv_color_white();
+        rect_fill_dsc.border_width = 1;
     }
-}
 
-/* static 추가 확인 완료 */
-static void battery_status_update_cb(struct battery_state state) {
-    struct zmk_widget_dongle_battery_status *widget;
-    SYS_SLIST_FOR_EACH_CONTAINER(&widgets, widget, node) { set_battery_symbol(widget->obj, state); }
-}
+    /* 배터리 헤드 부분 (폭 8픽셀 캔버스 기준 좌표 조정) */
+    lv_canvas_set_px(canvas, 0, 0, lv_color_white(), LV_OPA_COVER);
+    lv_canvas_set_px(canvas, 4, 0, lv_color_white(), LV_OPA_COVER);
 
-static struct battery_state peripheral_battery_status_get_state(const zmk_event_t *eh) {
-    const struct zmk_peripheral_battery_state_changed *ev = as_zmk_peripheral_battery_state_changed(eh);
-    return (struct battery_state){
-        .source = ev->source + SOURCE_OFFSET,
-        .level = ev->state_of_charge,
-    };
-}
+    lv_area_t rect_coords;
+    bool rect_draw = true;
+    
+    // 게이지 그리기 (좌표 1, 2, 3, 6 등)
+    if (level <= 10 || usb_present) { rect_coords = (lv_area_t){1, 2, 3, 6}; }
+    else if (level <= 30) { rect_coords = (lv_area_t){1, 2, 3, 5}; }
+    else if (level <= 50) { rect_coords = (lv_area_t){1, 2, 3, 4}; }
+    else if (level <= 70) { rect_coords = (lv_area_t){1, 2, 3, 3}; }
+    else if (level <= 90) { rect_coords = (lv_area_t){1, 2, 3, 2}; }
+    else { rect_draw = false; }
 
-static struct battery_state central_battery_status_get_state(const zmk_event_t *eh) {
-    const struct zmk_battery_state_changed *ev = as_zmk_battery_state_changed(eh);
-    return (struct battery_state) {
-        .source = 0,
-        .level = (ev != NULL) ? ev->state_of_charge : zmk_battery_state_of_charge(),
-#if IS_ENABLED(CONFIG_USB_DEVICE_STACK)
-        .usb_present = zmk_usb_is_powered(),
-#endif /* IS_ENABLED(CONFIG_USB_DEVICE_STACK) */
-    };
-}
-
-static struct battery_state battery_status_get_state(const zmk_event_t *eh) { 
-    if (as_zmk_peripheral_battery_state_changed(eh) != NULL) {
-        return peripheral_battery_status_get_state(eh);
-    } else {
-        return central_battery_status_get_state(eh);
+    if (rect_draw) {
+        lv_draw_rect(&layer, &rect_fill_dsc, &rect_coords);
     }
+
+    lv_canvas_finish_layer(canvas, &layer);
 }
-
-ZMK_DISPLAY_WIDGET_LISTENER(widget_dongle_battery_status, struct battery_state,
-                            battery_status_update_cb, battery_status_get_state)
-
-ZMK_SUBSCRIPTION(widget_dongle_battery_status, zmk_peripheral_battery_state_changed);
-
-#if IS_ENABLED(CONFIG_ZMK_DONGLE_DISPLAY_DONGLE_BATTERY)
-#if !IS_ENABLED(CONFIG_ZMK_SPLIT) || IS_ENABLED(CONFIG_ZMK_SPLIT_ROLE_CENTRAL)
-
-ZMK_SUBSCRIPTION(widget_dongle_battery_status, zmk_battery_state_changed);
-#if IS_ENABLED(CONFIG_USB_DEVICE_STACK)
-ZMK_SUBSCRIPTION(widget_dongle_battery_status, zmk_usb_conn_state_changed);
-#endif /* IS_ENABLED(CONFIG_USB_DEVICE_STACK) */
-#endif /* !IS_ENABLED(CONFIG_ZMK_SPLIT) || IS_ENABLED(CONFIG_ZMK_SPLIT_ROLE_CENTRAL) */
-#endif /* IS_ENABLED(CONFIG_ZMK_DONGLE_DISPLAY_DONGLE_BATTERY) */
 
 int zmk_widget_dongle_battery_status_init(struct zmk_widget_dongle_battery_status *widget, lv_obj_t *parent) {
     widget->obj = lv_obj_create(parent);
 
-    /* 위젯 크기를 전체 화면으로 잡고 배경을 검게 초기화 */
+    /* 1. 위젯 크기 명시적 지정 (동글 0.91 OLED 전체 크기) */
     lv_obj_set_size(widget->obj, 128, 32);
     lv_obj_set_style_bg_color(widget->obj, lv_color_black(), 0);
+    lv_obj_set_style_pad_all(widget->obj, 0, 0);
+    lv_obj_set_style_border_width(widget->obj, 0, 0);
 
     for (int i = 0; i < ZMK_SPLIT_BLE_PERIPHERAL_COUNT + SOURCE_OFFSET; i++) {
-        /* 일단 캔버스(이미지)는 제외하고 텍스트 라벨만 생성해서 위치를 잡습니다 */
+        /* 2. 캔버스 생성 - 폭을 반드시 8의 배수로 설정 (5 -> 8) */
+        lv_obj_t *image_canvas = lv_canvas_create(widget->obj);
+        lv_canvas_set_buffer(image_canvas, battery_image_buffer[i], 8, 8, LV_COLOR_FORMAT_I1);
+        lv_canvas_fill_bg(image_canvas, lv_color_black(), LV_OPA_COVER); // 초기화
+
+        /* 3. 라벨 생성 */
         lv_obj_t *battery_label = lv_label_create(widget->obj);
+        lv_label_set_text(battery_label, "---%");
 
-        /* 모든 라벨을 겹치지 않게 수직으로 나열 (0, 10, 20...) */
-        lv_obj_set_pos(battery_label, 0, i * 10);
-        lv_label_set_text(battery_label, "BAT.."); // 초기 텍스트 설정
+        /* 4. 배치 (중앙 한 줄 현상을 막기 위해 좌표를 넉넉히 벌림) */
+        lv_obj_align(image_canvas, LV_ALIGN_TOP_RIGHT, -2, i * 10);
+        lv_obj_align_to(battery_label, image_canvas, LV_ALIGN_OUT_LEFT_MID, -2, 0);
 
-        /* 노이즈 확인을 위해 일단 숨기지 않고 강제 표시 */
-        lv_obj_clear_flag(battery_label, LV_OBJ_FLAG_HIDDEN);
-        
         battery_objects[i] = (struct battery_object){
-            .symbol = NULL, // 일단 이미지 무시
+            .symbol = image_canvas,
             .label = battery_label,
         };
     }
