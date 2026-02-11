@@ -60,40 +60,37 @@ static struct output_status_state get_state(const zmk_event_t *_eh) {
 }
 
 static void set_status_symbol(lv_obj_t *widget, struct output_status_state state) {
-    if (widget == NULL) { return; }
+    if (widget == NULL) return;
 
-    lv_obj_t *usb = lv_obj_get_child(widget, 0);
+    // 객체 찾기 (안전을 위해 child 존재 여부 확인 권장하지만 일단 순서대로 접근)
     lv_obj_t *usb_hid_status = lv_obj_get_child(widget, 1);
-    lv_obj_t *bt = lv_obj_get_child(widget, 2);
     lv_obj_t *bt_number = lv_obj_get_child(widget, 3);
     lv_obj_t *bt_status = lv_obj_get_child(widget, 4);
     lv_obj_t *selection_line = lv_obj_get_child(widget, 5);
 
-    // USB / BT 선택 표시 바 업데이트
+    // 1. 선택 바 위치 및 가시성 제어 (노이즈 방지를 위해 위치를 확실히 고정)
     if (state.selected_endpoint.transport == ZMK_TRANSPORT_USB) {
-        lv_obj_set_x(selection_line, 0);
-        lv_obj_set_width(selection_line, 12);
+        lv_obj_set_x(selection_line, 1);
+        lv_obj_set_width(selection_line, 10);
     } else {
-        lv_obj_set_x(selection_line, 20);
-        lv_obj_set_width(selection_line, 20);
+        lv_obj_set_x(selection_line, 21);
+        lv_obj_set_width(selection_line, 15);
     }
 
-    // USB HID 연결 상태
+    // 2. USB 상태 (이미지 소스가 NULL이 되지 않도록 주의)
     if (usb_hid_status) {
         lv_img_set_src(usb_hid_status, state.usb_is_hid_ready ? &sym_ok : &sym_nok);
     }
 
-    // Bluetooth 프로필 번호 (0-4 index를 1-5 이미지로 매핑)
-    if (bt_number && state.active_profile_index >= 0 && state.active_profile_index < 5) {
-        lv_img_set_src(bt_number, sym_num[state.active_profile_index]);
-    }
-
-    // Bluetooth 연결 및 본딩 상태
-    if (bt_status) {
-        if (state.active_profile_bonded) {
-            lv_img_set_src(bt_status, state.active_profile_connected ? &sym_ok : &sym_nok);
-        } else {
-            lv_img_set_src(bt_status, &sym_open);
+    // 3. BT 번호 및 상태
+    if (state.active_profile_index >= 0 && state.active_profile_index < 5) {
+        if (bt_number) lv_img_set_src(bt_number, sym_num[state.active_profile_index]);
+        if (bt_status) {
+            if (state.active_profile_bonded) {
+                lv_img_set_src(bt_status, state.active_profile_connected ? &sym_ok : &sym_nok);
+            } else {
+                lv_img_set_src(bt_status, &sym_open);
+            }
         }
     }
 }
@@ -115,49 +112,52 @@ ZMK_SUBSCRIPTION(widget_output_status, zmk_usb_conn_state_changed);
 
 int zmk_widget_output_status_init(struct zmk_widget_output_status *widget, lv_obj_t *parent) {
     widget->obj = lv_obj_create(parent);
-    lv_obj_set_size(widget->obj, 45, 20);
+    
+    // 크기를 명확히 지정하여 범위를 벗어난 그리기 방지
+    lv_obj_set_size(widget->obj, 45, 16); 
     lv_obj_set_style_bg_opa(widget->obj, LV_OPA_TRANSP, 0);
     lv_obj_set_style_border_width(widget->obj, 0, 0);
     lv_obj_set_style_pad_all(widget->obj, 0, 0);
+    // 스크롤바가 노이즈처럼 보일 수 있으므로 제거
+    lv_obj_set_scrollbar_mode(widget->obj, LV_SCROLLBAR_MODE_OFF);
 
     // Child 0: USB Icon
     lv_obj_t *usb = lv_img_create(widget->obj);
     lv_img_set_src(usb, &sym_usb);
-    lv_obj_align(usb, LV_ALIGN_TOP_LEFT, 1, 4);
+    lv_obj_align(usb, LV_ALIGN_TOP_LEFT, 1, 2);
 
-    // Child 1: USB Status (OK/NOK)
+    // Child 1: USB Status
     lv_obj_t *usb_hid_status = lv_img_create(widget->obj);
-    lv_obj_align(usb_hid_status, LV_ALIGN_TOP_LEFT, 3, 5);
+    lv_obj_align(usb_hid_status, LV_ALIGN_TOP_LEFT, 3, 3);
 
     // Child 2: BT Icon
     lv_obj_t *bt = lv_img_create(widget->obj);
     lv_img_set_src(bt, &sym_bt);
-    lv_obj_align(bt, LV_ALIGN_TOP_LEFT, 21, 4);
+    lv_obj_align(bt, LV_ALIGN_TOP_LEFT, 21, 2);
 
-    // Child 3: BT Number (1-5)
+    // Child 3: BT Number
     lv_obj_t *bt_number = lv_img_create(widget->obj);
-    lv_obj_align(bt_number, LV_ALIGN_TOP_LEFT, 32, 11);
+    lv_obj_align(bt_number, LV_ALIGN_TOP_LEFT, 32, 9);
 
-    // Child 4: BT Status (OK/NOK/Open)
+    // Child 4: BT Status
     lv_obj_t *bt_status = lv_img_create(widget->obj);
-    lv_obj_align(bt_status, LV_ALIGN_TOP_LEFT, 32, 5);
+    lv_obj_align(bt_status, LV_ALIGN_TOP_LEFT, 32, 3);
     
-    // Child 5: Selection Bar
+    // Child 5: Selection Bar (선 형태로 단순화)
     lv_obj_t *selection_line = lv_obj_create(widget->obj);
     lv_obj_set_height(selection_line, 1);
     lv_obj_set_style_bg_color(selection_line, lv_color_white(), 0);
     lv_obj_set_style_bg_opa(selection_line, LV_OPA_COVER, 0);
     lv_obj_set_style_border_width(selection_line, 0, 0);
-    lv_obj_align(selection_line, LV_ALIGN_TOP_LEFT, 0, 2);
+    // 화면 맨 상단에 위치
+    lv_obj_align(selection_line, LV_ALIGN_TOP_LEFT, 0, 0);
  
     sys_slist_append(&widgets, &widget->node);
     widget_output_status_init();
-    
     set_status_symbol(widget->obj, get_state(NULL));
     
     return 0;
 }
-
 lv_obj_t *zmk_widget_output_status_obj(struct zmk_widget_output_status *widget) {
     return widget->obj;
 }
