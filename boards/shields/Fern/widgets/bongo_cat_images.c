@@ -49,9 +49,7 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_BONGO_CAT
 };
 
 const lv_img_dsc_t bongo_cat_none = {
-  .header.cf = LV_IMG_CF_INDEXED_1BIT,
-  .header.always_zero = 0,
-  .header.reserved = 0,
+  .header.cf = LV_IMG_CF_INDEXED_I1, // 최신 ZMK라면 LV_COLOR_FORMAT_I1 일 수 있으나 기본값 유지 시도
   .header.w = 50,
   .header.h = 26,
   .data_size = 190,
@@ -95,9 +93,7 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_BONGO_CAT
 };
 
 const lv_img_dsc_t bongo_cat_left1 = {
-  .header.cf = LV_IMG_CF_INDEXED_1BIT,
-  .header.always_zero = 0,
-  .header.reserved = 0,
+  .header.cf = LV_IMG_CF_INDEXED_I1,
   .header.w = 50,
   .header.h = 26,
   .data_size = 190,
@@ -141,9 +137,7 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_BONGO_CAT
 };
 
 const lv_img_dsc_t bongo_cat_left2 = {
-  .header.cf = LV_IMG_CF_INDEXED_1BIT,
-  .header.always_zero = 0,
-  .header.reserved = 0,
+  .header.cf = LV_IMG_CF_INDEXED_I1,
   .header.w = 50,
   .header.h = 26,
   .data_size = 190,
@@ -187,9 +181,7 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_BONGO_CAT
 };
 
 const lv_img_dsc_t bongo_cat_right1 = {
-  .header.cf = LV_IMG_CF_INDEXED_1BIT,
-  .header.always_zero = 0,
-  .header.reserved = 0,
+  .header.cf = LV_IMG_CF_INDEXED_I1,
   .header.w = 50,
   .header.h = 26,
   .data_size = 190,
@@ -233,9 +225,7 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_BONGO_CAT
 };
 
 const lv_img_dsc_t bongo_cat_right2 = {
-  .header.cf = LV_IMG_CF_INDEXED_1BIT,
-  .header.always_zero = 0,
-  .header.reserved = 0,
+  .header.cf = LV_IMG_CF_INDEXED_I1,
   .header.w = 50,
   .header.h = 26,
   .data_size = 190,
@@ -279,9 +269,7 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_BONGO_CAT
 };
 
 const lv_img_dsc_t bongo_cat_both1 = {
-  .header.cf = LV_IMG_CF_INDEXED_1BIT,
-  .header.always_zero = 0,
-  .header.reserved = 0,
+  .header.cf = LV_IMG_CF_INDEXED_I1,
   .header.w = 50,
   .header.h = 26,
   .data_size = 190,
@@ -325,9 +313,7 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_BONGO_CAT
 };
 
 const lv_img_dsc_t bongo_cat_both1_open = {
-  .header.cf = LV_IMG_CF_INDEXED_1BIT,
-  .header.always_zero = 0,
-  .header.reserved = 0,
+  .header.cf = LV_IMG_CF_INDEXED_I1,
   .header.w = 50,
   .header.h = 26,
   .data_size = 190,
@@ -371,9 +357,7 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_BONGO_CAT
 };
 
 const lv_img_dsc_t bongo_cat_both2 = {
-  .header.cf = LV_IMG_CF_INDEXED_1BIT,
-  .header.always_zero = 0,
-  .header.reserved = 0,
+  .header.cf = LV_IMG_CF_INDEXED_I1,
   .header.w = 50,
   .header.h = 26,
   .data_size = 190,
