@@ -3,7 +3,7 @@
 / {
     chosen {
         zmk,matrix_transform = &default_transform;
-        zephyr,display = &oled;
+        zephyr,display = &oled_128x32;
     };
 
     default_transform: keymap_transform_0 {
@@ -34,7 +34,8 @@
         multiplex-ratio = <31>;  // 0.91인치 필수
         segment-remap;           // 좌우 반전
         com-invdir;              // 상하 반전
-        
+        com-sequential;
+        inversion-on;
         prechargep = <0x22>;
 
     };
