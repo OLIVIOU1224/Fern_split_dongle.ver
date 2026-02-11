@@ -30,7 +30,9 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #  define ZMK_SPLIT_BLE_PERIPHERAL_COUNT 0
 #endif
 
-#define BUFFER_SIZE (5 * 8 / 8 + 8)
+/* ### 수정: LVGL 9에서는 I1(1비트) 포맷 사용 시 가로 폭을 8의 배수로 정렬하는 것이 안전합니다. ### */
+/* (5px 폭이지만 안전하게 8px 분량의 공간 할당) */
+#define BUFFER_SIZE (8 * 8 / 8) 
 
 static sys_slist_t widgets = SYS_SLIST_STATIC_INIT(&widgets);
 
@@ -48,6 +50,7 @@ struct battery_object {
 static lv_color_t battery_image_buffer[ZMK_SPLIT_BLE_PERIPHERAL_COUNT + SOURCE_OFFSET][BUFFER_SIZE];
 
 static void draw_battery(lv_obj_t *canvas, uint8_t level, bool usb_present) {
+    /* ### 수정: 그리기 전 캔버스를 깨끗하게 비워 노이즈 방지 ### */
     lv_canvas_fill_bg(canvas, lv_color_black(), LV_OPA_COVER);
     
     lv_layer_t layer;
@@ -112,6 +115,7 @@ static void set_battery_symbol(lv_obj_t *widget, struct battery_state state) {
     }
 }
 
+/* static 추가 확인 완료 */
 static void battery_status_update_cb(struct battery_state state) {
     struct zmk_widget_dongle_battery_status *widget;
     SYS_SLIST_FOR_EACH_CONTAINER(&widgets, widget, node) { set_battery_symbol(widget->obj, state); }
@@ -168,10 +172,14 @@ int zmk_widget_dongle_battery_status_init(struct zmk_widget_dongle_battery_statu
         lv_obj_t *image_canvas = lv_canvas_create(widget->obj);
         lv_obj_t *battery_label = lv_label_create(widget->obj);
 
-        lv_canvas_set_buffer(image_canvas, battery_image_buffer[i], 5, 8, LV_COLOR_FORMAT_I1);
+        /* ### 수정: 폭 5px를 8px 정렬하여 I1 포맷 지정 ### */
+        lv_canvas_set_buffer(image_canvas, battery_image_buffer[i], 8, 8, LV_COLOR_FORMAT_I1);
 
         lv_obj_align(image_canvas, LV_ALIGN_TOP_RIGHT, 0, i * 10);
         lv_obj_align_to(battery_label, image_canvas, LV_ALIGN_OUT_LEFT_MID, 0, 0);
+
+        /* ### 추가: 생성 직후 검은색으로 밀어버려 초기 노이즈 제거 ### */
+        lv_canvas_fill_bg(image_canvas, lv_color_black(), LV_OPA_COVER);
 
         lv_obj_add_flag(image_canvas, LV_OBJ_FLAG_HIDDEN);
         lv_obj_add_flag(battery_label, LV_OBJ_FLAG_HIDDEN);
