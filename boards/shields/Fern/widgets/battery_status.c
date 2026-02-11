@@ -166,32 +166,28 @@ ZMK_SUBSCRIPTION(widget_dongle_battery_status, zmk_usb_conn_state_changed);
 int zmk_widget_dongle_battery_status_init(struct zmk_widget_dongle_battery_status *widget, lv_obj_t *parent) {
     widget->obj = lv_obj_create(parent);
 
-    lv_obj_set_size(widget->obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    /* 위젯 크기를 전체 화면으로 잡고 배경을 검게 초기화 */
+    lv_obj_set_size(widget->obj, 128, 32);
+    lv_obj_set_style_bg_color(widget->obj, lv_color_black(), 0);
 
     for (int i = 0; i < ZMK_SPLIT_BLE_PERIPHERAL_COUNT + SOURCE_OFFSET; i++) {
-        lv_obj_t *image_canvas = lv_canvas_create(widget->obj);
+        /* 일단 캔버스(이미지)는 제외하고 텍스트 라벨만 생성해서 위치를 잡습니다 */
         lv_obj_t *battery_label = lv_label_create(widget->obj);
 
-        /* ### 수정: 폭 5px를 8px 정렬하여 I1 포맷 지정 ### */
-        lv_canvas_set_buffer(image_canvas, battery_image_buffer[i], 8, 8, LV_COLOR_FORMAT_I1);
+        /* 모든 라벨을 겹치지 않게 수직으로 나열 (0, 10, 20...) */
+        lv_obj_set_pos(battery_label, 0, i * 10);
+        lv_label_set_text(battery_label, "BAT.."); // 초기 텍스트 설정
 
-        lv_obj_align(image_canvas, LV_ALIGN_TOP_RIGHT, 0, i * 10);
-        lv_obj_align_to(battery_label, image_canvas, LV_ALIGN_OUT_LEFT_MID, 0, 0);
-
-        /* ### 추가: 생성 직후 검은색으로 밀어버려 초기 노이즈 제거 ### */
-        lv_canvas_fill_bg(image_canvas, lv_color_black(), LV_OPA_COVER);
-
-        lv_obj_add_flag(image_canvas, LV_OBJ_FLAG_HIDDEN);
-        lv_obj_add_flag(battery_label, LV_OBJ_FLAG_HIDDEN);
+        /* 노이즈 확인을 위해 일단 숨기지 않고 강제 표시 */
+        lv_obj_clear_flag(battery_label, LV_OBJ_FLAG_HIDDEN);
         
         battery_objects[i] = (struct battery_object){
-            .symbol = image_canvas,
+            .symbol = NULL, // 일단 이미지 무시
             .label = battery_label,
         };
     }
 
     sys_slist_append(&widgets, &widget->node);
-
     widget_dongle_battery_status_init();
 
     return 0;
