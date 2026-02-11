@@ -21,7 +21,6 @@
 
 &xiao_i2c {
     status = "okay";
-    clock-frequency = <100000>;
 
     oled: ssd1306@3c {
         compatible = "solomon,ssd1306fb";
@@ -37,7 +36,6 @@
         com-invdir;              // 상하 반전
         
         prechargep = <0x22>;
-        
-        /* com-sequential;  <-- 이 줄은 절대 넣지 마세요! (0.91인치는 Alternative 방식 사용) */
+
     };
 };
