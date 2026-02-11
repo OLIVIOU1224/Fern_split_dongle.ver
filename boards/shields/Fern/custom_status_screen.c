@@ -49,7 +49,7 @@ lv_obj_t *zmk_display_status_screen() {
 
     // 3. 봉고캣 (중앙 우측) - 0.91인치 높이를 고려해 y좌표 조정
     zmk_widget_bongo_cat_init(&bongo_cat_widget, screen);
-    lv_obj_align(zmk_widget_bongo_cat_obj(&bongo_cat_widget), LV_ALIGN_BOTTOM_RIGHT, 0, -5);
+    lv_obj_align(zmk_widget_bongo_cat_obj(&bongo_cat_widget), LV_ALIGN_BOTTOM_RIGHT, 0, 0);
 
     // 4. 모디파이어 상태 (좌하단)
     zmk_widget_modifiers_init(&modifiers_widget, screen);
