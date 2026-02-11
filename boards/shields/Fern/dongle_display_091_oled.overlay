@@ -30,11 +30,11 @@
         segment-offset = <0>;
         page-offset = <0>;
         display-offset = <0>;
-        multiplex-ratio = <31>;
+        multiplex-ratio = <31>;  /* 32개 라인 사용 */
         segment-remap;
         com-invdir;
-        /* com-sequential; 을 지우고 아래의 'alternative' 설정을 명시하지 않는 것이 SSD1306 기본값입니다. */
-        /* 많은 0.91인치 모듈이 이 상태에서 정상 작동합니다. */
+        /* com-sequential; 이 줄이 있다면 반드시 삭제하세요 */
+        /* inversion-on;  이 줄도 일단 삭제하여 검은 배경으로 테스트하세요 */
         prechargep = <0x22>;
     };
 };
