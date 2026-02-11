@@ -1,11 +1,9 @@
 /*
  * Copyright (c) 2024 The ZMK Contributors
- *
  * SPDX-License-Identifier: MIT
  */
 
 #include <zephyr/kernel.h>
-#include <zephyr/bluetooth/services/bas.h>
 #include <zephyr/logging/log.h>
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
@@ -29,11 +27,6 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #  define ZMK_SPLIT_BLE_PERIPHERAL_COUNT 0
 #endif
 
-/* LVGL 9 정렬을 위해 가로 폭을 8의 배수로 설정 */
-#define CANVAS_WIDTH 8
-#define CANVAS_HEIGHT 8
-#define BUFFER_SIZE 16
-
 static sys_slist_t widgets = SYS_SLIST_STATIC_INIT(&widgets);
 
 struct battery_state {
@@ -42,78 +35,53 @@ struct battery_state {
     bool usb_present;
 };
 
+// 캔버스를 제거하고 일반 lv_obj_t (도형)로 대체
 struct battery_object {
-    lv_obj_t *symbol;
+    lv_obj_t *rect; 
     lv_obj_t *label;
 } battery_objects[ZMK_SPLIT_BLE_PERIPHERAL_COUNT + SOURCE_OFFSET];
-    
-static uint8_t battery_image_buffer[ZMK_SPLIT_BLE_PERIPHERAL_COUNT + SOURCE_OFFSET][BUFFER_SIZE];
 
-static void draw_battery(lv_obj_t *canvas, uint8_t level, bool usb_present) {
-    if (canvas == NULL) return;
+static void update_battery_visual(int index, uint8_t level, bool usb_present) {
+    lv_obj_t *rect = battery_objects[index].rect;
+    if (!rect) return;
 
-    lv_canvas_fill_bg(canvas, lv_color_black(), LV_OPA_COVER);
-    
-    lv_layer_t layer;
-    lv_canvas_init_layer(canvas, &layer);
-
-    lv_draw_rect_dsc_t rect_fill_dsc;
-    lv_draw_rect_dsc_init(&rect_fill_dsc);
-    rect_fill_dsc.bg_color = lv_color_white();
-
+    // 배터리 잔량에 따라 테두리 색상이나 배경으로 표현
     if (usb_present) {
-        rect_fill_dsc.bg_opa = LV_OPA_TRANSP;
-        rect_fill_dsc.border_color = lv_color_white();
-        rect_fill_dsc.border_width = 1;
+        lv_obj_set_style_border_side(rect, LV_BORDER_SIDE_FULL, 0);
+        lv_obj_set_style_border_width(rect, 1, 0);
+        lv_obj_set_style_border_color(rect, lv_color_white(), 0);
+    } else {
+        lv_obj_set_style_border_width(rect, 0, 0);
+        lv_obj_set_style_bg_color(rect, lv_color_white(), 0);
+        lv_obj_set_style_bg_opa(rect, LV_OPA_COVER, 0);
     }
-
-    // 간단한 배터리 형태 그리기
-    lv_area_t rect_coords = {1, 2, 5, 7};
-    lv_draw_rect(&layer, &rect_fill_dsc, &rect_coords);
-
-    lv_canvas_finish_layer(canvas, &layer);
 }
 
-static void set_battery_symbol(lv_obj_t *widget_obj, struct battery_state state) {
+static void set_battery_symbol(struct battery_state state) {
     if (state.source >= ZMK_SPLIT_BLE_PERIPHERAL_COUNT + SOURCE_OFFSET) return;
 
-    lv_obj_t *symbol = battery_objects[state.source].symbol;
     lv_obj_t *label = battery_objects[state.source].label;
-
-    if (symbol) draw_battery(symbol, state.level, state.usb_present);
-    if (label) lv_label_set_text_fmt(label, "%3u%%", state.level);
+    if (label) {
+        lv_label_set_text_fmt(label, "%3u%%", state.level);
+    }
+    update_battery_visual(state.source, state.level, state.usb_present);
 }
 
 static void battery_status_update_cb(struct battery_state state) {
-    struct zmk_widget_dongle_battery_status *widget;
-    SYS_SLIST_FOR_EACH_CONTAINER(&widgets, widget, node) { 
-        set_battery_symbol(widget->obj, state); 
+    set_battery_symbol(state);
+}
+
+static struct battery_state battery_status_get_state(const zmk_event_t *eh) {
+    if (as_zmk_peripheral_battery_state_changed(eh) != NULL) {
+        const struct zmk_peripheral_battery_state_changed *ev = as_zmk_peripheral_battery_state_changed(eh);
+        return (struct battery_state){.source = ev->source + SOURCE_OFFSET, .level = ev->state_of_charge, .usb_present = false};
     }
-}
-
-static struct battery_state peripheral_battery_status_get_state(const zmk_event_t *eh) {
-    const struct zmk_peripheral_battery_state_changed *ev = as_zmk_peripheral_battery_state_changed(eh);
-    return (struct battery_state){
-        .source = ev->source + SOURCE_OFFSET,
-        .level = ev->state_of_charge,
-    };
-}
-
-static struct battery_state central_battery_status_get_state(const zmk_event_t *eh) {
-    const struct zmk_battery_state_changed *ev = as_zmk_battery_state_changed(eh);
+    
     return (struct battery_state) {
         .source = 0,
-        .level = (ev != NULL) ? ev->state_of_charge : zmk_battery_state_of_charge(),
+        .level = zmk_battery_state_of_charge(),
         .usb_present = zmk_usb_is_powered(),
     };
-}
-
-static struct battery_state battery_status_get_state(const zmk_event_t *eh) { 
-    if (as_zmk_peripheral_battery_state_changed(eh) != NULL) {
-        return peripheral_battery_status_get_state(eh);
-    } else {
-        return central_battery_status_get_state(eh);
-    }
 }
 
 ZMK_DISPLAY_WIDGET_LISTENER(widget_dongle_battery_status, struct battery_state,
@@ -127,20 +95,22 @@ ZMK_SUBSCRIPTION(widget_dongle_battery_status, zmk_peripheral_battery_state_chan
 
 int zmk_widget_dongle_battery_status_init(struct zmk_widget_dongle_battery_status *widget, lv_obj_t *parent) {
     widget->obj = lv_obj_create(parent);
-    lv_obj_set_size(widget->obj, 128, 32);
-    lv_obj_set_style_bg_color(widget->obj, lv_color_black(), 0);
+    lv_obj_set_size(widget->obj, 40, 32); // 배터리 위젯 크기 최적화
+    lv_obj_set_style_bg_opa(widget->obj, LV_OPA_TRANSP, 0);
+    lv_obj_set_style_border_width(widget->obj, 0, 0);
 
     for (int i = 0; i < ZMK_SPLIT_BLE_PERIPHERAL_COUNT + SOURCE_OFFSET; i++) {
-        lv_obj_t *label = lv_label_create(widget->obj);
-        lv_obj_t *symbol = lv_canvas_create(widget->obj);
-        
-        lv_canvas_set_buffer(symbol, battery_image_buffer[i], CANVAS_WIDTH, CANVAS_HEIGHT, LV_COLOR_FORMAT_I1);
-        
-        lv_obj_align(symbol, LV_ALIGN_TOP_RIGHT, -2, i * 10);
-        lv_obj_align_to(label, symbol, LV_ALIGN_OUT_LEFT_MID, -2, 0);
+        // 캔버스 대신 아주 작은 '바(Bar)' 또는 '사각형' 생성
+        lv_obj_t *rect = lv_obj_create(widget->obj);
+        lv_obj_set_size(rect, 6, 8); 
+        lv_obj_align(rect, LV_ALIGN_TOP_RIGHT, 0, i * 11);
+        lv_obj_set_style_bg_color(rect, lv_color_white(), 0);
 
-        battery_objects[i] = (struct battery_object){ .symbol = symbol, .label = label };
-        draw_battery(symbol, 0, false);
+        lv_obj_t *label = lv_label_create(widget->obj);
+        lv_obj_set_style_text_font(label, &lv_font_unscii_8, 0);
+        lv_obj_align_to(label, rect, LV_ALIGN_OUT_LEFT_MID, -2, 0);
+
+        battery_objects[i] = (struct battery_object){ .rect = rect, .label = label };
     }
 
     sys_slist_append(&widgets, &widget->node);
