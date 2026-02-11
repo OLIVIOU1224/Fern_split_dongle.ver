@@ -1,6 +1,5 @@
 /*
  * Copyright (c) 2020 The ZMK Contributors
- *
  * SPDX-License-Identifier: MIT
  */
 
@@ -24,24 +23,25 @@ struct layer_status_state {
 };
 
 static void set_layer_symbol(lv_obj_t *label, struct layer_status_state state) {
+    if (label == NULL) return;
+
+    // 버퍼를 넉넉하게 잡고 안전하게 처리
+    char text[16] = {0};
+
     if (state.label == NULL) {
-        char text[7] = {};
-
-        sprintf(text, "%i", state.index);
-
-        lv_label_set_text(label, text);
+        snprintf(text, sizeof(text), "L%i", state.index);
     } else {
-        char text[13] = {};
-
         snprintf(text, sizeof(text), "%s", state.label);
-
-        lv_label_set_text(label, text);
     }
+
+    lv_label_set_text(label, text);
 }
 
 static void layer_status_update_cb(struct layer_status_state state) {
     struct zmk_widget_layer_status *widget;
-    SYS_SLIST_FOR_EACH_CONTAINER(&widgets, widget, node) { set_layer_symbol(widget->obj, state); }
+    SYS_SLIST_FOR_EACH_CONTAINER(&widgets, widget, node) { 
+        set_layer_symbol(widget->obj, state); 
+    }
 }
 
 static struct layer_status_state layer_status_get_state(const zmk_event_t *eh) {
@@ -59,24 +59,12 @@ ZMK_SUBSCRIPTION(widget_layer_status, zmk_layer_state_changed);
 
 int zmk_widget_layer_status_init(struct zmk_widget_layer_status *widget, lv_obj_t *parent) {
     widget->obj = lv_label_create(parent);
-    lv_obj_set_width(widget->obj, CONFIG_ZMK_DONGLE_DISPLAY_LAYER_NAME_SCROLL_WIDTH);
-    lv_label_set_long_mode(widget->obj, LV_LABEL_LONG_SCROLL_CIRCULAR);
+    
+    // 노이즈 방지를 위해 스크롤 모드를 일단 끄거나 제한적으로 설정합니다.
+    // 만약 이름이 길지 않다면 롱모드를 제거하는 것이 가장 안전합니다.
+    lv_obj_set_width(widget->obj, 64); // 고정 폭 설정 (128의 절반 정도)
+    lv_label_set_long_mode(widget->obj, LV_LABEL_LONG_DOTS); // 스크롤 대신 '...' 표시 (안전)
 
-    // Set text alignment based on config
-    if (strcmp(CONFIG_ZMK_DONGLE_DISPLAY_LAYER_TEXT_ALIGN, "right") == 0) {
-        lv_obj_set_style_text_align(widget->obj, LV_TEXT_ALIGN_RIGHT, 0);
-    } else if (strcmp(CONFIG_ZMK_DONGLE_DISPLAY_LAYER_TEXT_ALIGN, "center") == 0) {
-        lv_obj_set_style_text_align(widget->obj, LV_TEXT_ALIGN_CENTER, 0);
-    } else {
-        lv_obj_set_style_text_align(widget->obj, LV_TEXT_ALIGN_LEFT, 0);
-    }
-
-    sys_slist_append(&widgets, &widget->node);
-
-    widget_layer_status_init();
-    return 0;
-}
-
-lv_obj_t *zmk_widget_layer_status_obj(struct zmk_widget_layer_status *widget) {
-    return widget->obj;
-}
+    // 텍스트 정렬 설정
+    #if defined(CONFIG_ZMK_DONGLE_DISPLAY_LAYER_TEXT_ALIGN)
+    if (strcmp(
