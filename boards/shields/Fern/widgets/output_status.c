@@ -170,34 +170,47 @@ ZMK_SUBSCRIPTION(widget_output_status, zmk_usb_conn_state_changed);
 int zmk_widget_output_status_init(struct zmk_widget_output_status *widget, lv_obj_t *parent) {
     widget->obj = lv_obj_create(parent);
 
-    lv_obj_set_size(widget->obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    /* ### 수정 1: 크기를 명시적으로 고정 (콘텐츠에 맡기지 않음) ### */
+    lv_obj_set_size(widget->obj, 60, 32); // 출력 상태창에 필요한 적정 크기
+    lv_obj_set_style_bg_color(widget->obj, lv_color_black(), 0);
+    lv_obj_set_style_pad_all(widget->obj, 0, 0);
+    lv_obj_set_style_border_width(widget->obj, 0, 0);
 
+    /* USB 아이콘 */
     lv_obj_t *usb = lv_img_create(widget->obj);
-    lv_obj_align(usb, LV_ALIGN_TOP_LEFT, 1, 4);
     lv_img_set_src(usb, &sym_usb);
+    lv_obj_align(usb, LV_ALIGN_TOP_LEFT, 1, 4);
 
+    /* USB 상태 점 */
     lv_obj_t *usb_hid_status = lv_img_create(widget->obj);
-    lv_obj_align_to(usb_hid_status, usb, LV_ALIGN_BOTTOM_LEFT, 2, -7);
+    // 0.91인치 높이(32)를 고려하여 좌표를 안전하게 조정
+    lv_obj_align_to(usb_hid_status, usb, LV_ALIGN_BOTTOM_LEFT, 2, -2); 
 
+    /* BT 아이콘 */
     lv_obj_t *bt = lv_img_create(widget->obj);
-    lv_obj_align_to(bt, usb, LV_ALIGN_OUT_RIGHT_TOP, 6, 0);
     lv_img_set_src(bt, &sym_bt);
+    lv_obj_align_to(bt, usb, LV_ALIGN_OUT_RIGHT_TOP, 10, 0);
 
+    /* BT 번호 */
     lv_obj_t *bt_number = lv_img_create(widget->obj);
     lv_obj_align_to(bt_number, bt, LV_ALIGN_OUT_RIGHT_TOP, 2, 7);
 
+    /* BT 상태 점 */
     lv_obj_t *bt_status = lv_img_create(widget->obj);
     lv_obj_align_to(bt_status, bt, LV_ALIGN_OUT_RIGHT_TOP, 2, 1);
     
+    /* 선택 라인 스타일 */
     static lv_style_t style_line;
     lv_style_init(&style_line);
-    lv_style_set_line_width(&style_line, 2);
+    lv_style_set_line_width(&style_line, 1); // 2에서 1로 줄여 메모리 절약
+    lv_style_set_line_color(&style_line, lv_color_white());
 
-    lv_obj_t *selection_line;
-    selection_line = lv_line_create(widget->obj);
+    /* 선택 라인 */
+    lv_obj_t *selection_line = lv_line_create(widget->obj);
     lv_line_set_points(selection_line, selection_line_points, 2);
     lv_obj_add_style(selection_line, &style_line, 0);
-    lv_obj_align_to(selection_line, usb, LV_ALIGN_OUT_TOP_LEFT, 3, -1);
+    // 선택 라인 위치가 화면 밖으로 나가지 않도록 조정
+    lv_obj_align_to(selection_line, usb, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 2);
  
     sys_slist_append(&widgets, &widget->node);
 
