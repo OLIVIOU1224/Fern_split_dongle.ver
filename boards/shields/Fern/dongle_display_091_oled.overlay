@@ -21,7 +21,7 @@
 
 &xiao_i2c {
     status = "okay";
-    clock-frequency = <100000>; // 400000보다 100000이 훨씬 안정적입니다.
+    clock-frequency = <100000>;
 
     oled: ssd1306@3c {
         compatible = "solomon,ssd1306fb";
@@ -31,11 +31,13 @@
         segment-offset = <0>;
         page-offset = <0>;
         display-offset = <0>;
-        multiplex-ratio = <31>; // 0.91인치(32라인) 필수 설정
-        segment-remap;          // 0.91인치 정방향 출력 필수
-        com-invdir;             // 0.91인치 정방향 출력 필수
-        prechargep = <0x22>;
+        multiplex-ratio = <31>;
         
-        /* com-sequential; 이 줄이 있으면 0.91인치는 흰 줄 노이즈가 발생합니다. 절대로 넣지 마세요. */
+        /* englmaxi 원본 설정과 동일하게 맞춤 */
+        segment-remap;
+        com-invdir;
+        com-sequential; 
+        
+        prechargep = <0x22>;
     };
 };
