@@ -31,13 +31,13 @@
         segment-offset = <0>;
         page-offset = <0>;
         display-offset = <0>;
-        multiplex-ratio = <31>;
         
-        /* englmaxi 원본 설정과 동일하게 맞춤 */
-        segment-remap;
-        com-invdir;
-        com-sequential; 
+        multiplex-ratio = <31>;  // 0.91인치 필수
+        segment-remap;           // 좌우 반전
+        com-invdir;              // 상하 반전
         
         prechargep = <0x22>;
+        
+        /* com-sequential;  <-- 이 줄은 절대 넣지 마세요! (0.91인치는 Alternative 방식 사용) */
     };
 };
