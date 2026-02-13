@@ -70,7 +70,7 @@ struct output_status_state {
 static struct output_status_state get_state(const zmk_event_t *_eh) {
     struct output_status_state st;
 
-    st.selected_endpoint = zmk_endpoints_selected();
+    st.selected_endpoint = zmk_endpoint_get_selected();
 
 #if IS_ENABLED(CONFIG_ZMK_BLE)
     st.active_profile_index     = zmk_ble_active_profile_index();
